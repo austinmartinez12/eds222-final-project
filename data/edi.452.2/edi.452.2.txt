@@ -1,0 +1,1995 @@
+
+  
+    
+      uid=EDI,o=EDI,dc=edirepository,dc=org
+      all
+    
+    
+      uid=edi,o=EDI,dc=edirepository,dc=org
+      all
+    
+    
+      public
+      read
+    
+  
+  
+    doi:10.6073/pasta/d581077c23dcfe33f48baf835339fa2f
+    Lake chloride concentrations and model predictions for 49,432 lakes in the Midwest and
+      Northeast United States.
+    
+      Hilary Dugan
+      University of Wisconsin-Madison
+      hdugan@wisc.edu
+      https://orcid.org/0000-0003-4674-1149
+    
+    
+      Nicholas Skaff
+      University of California, Berkeley University
+      nskaff@berkeley.edu
+      https://orcid.org/0000-0002-5929-3966
+    
+    
+      Jonathan Doubek
+      Lake Superior State University
+      jdoubek@lssu.edu
+      https://orcid.org/0000-0003-2651-4715
+    
+    
+      Sarah Bartlett
+      NEW Water, Green Bay, WI
+      slbartlett8@gmail.com
+      https://orcid.org/0000-0003-0494-9320
+    
+    
+      Samantha Burke
+      University of Guelph
+      samantha.burke2@gmail.com
+    
+    
+      Flora Krivak-Tetley
+      Dartmouth College
+      fkt.gr@dartmouth.edu
+      https://orcid.org/0000-0003-3521-2460
+    
+    
+      Jamie Summers
+      jamiecsummers@gmail.com
+      https://orcid.org/0000-0002-7497-2326
+    
+    2020-04-24
+    
+       Lakes in the Midwest and Northeast United States are at risk of anthropogenic chloride
+        contamination, but we have little knowledge of the prevalence and spatial distribution of
+        the problem. The majority of salt pollution in north temperate regions stems from road salt
+        application but other chloride sources include water softeners, synthetic fertilizers, and
+        livestock excretion. Although chloride contamination of lakes is well documented, it is
+        unknown how many lakes are at risk of long-term salinization. We used a quantile regression
+        forest to leverage information from 2,773 lakes to predict the chloride concentration of all
+        49,432 lakes greater than 4 ha in a 17-state area. The QRF used 22 predictor variables,
+        which included lake morphometry characteristics, watershed land use, and distance to the
+        nearest interstate and road. Model predictions had an r2 of 0.94 for all chloride
+        observations, and 0.87 for predictions of the mean chloride concentration observed at each
+        lake. 
+    
+    
+      Chloride
+      reservoirs
+      LAGOS
+      road salt
+      salt
+      impervious surface
+      salinization
+    
+    
+      lakes
+      limnology
+      LTER Controlled Vocabulary
+    
+    
+       This information is released under the Creative Commons license - Attribution - CC BY
+        (https://creativecommons.org/licenses/by/4.0/). The consumer of these data ("Data User"
+        herein) is required to cite it appropriately in any publication that results from its use.
+        The Data User should realize that these data may be actively used by others for ongoing
+        research and that coordination may be necessary to prevent duplicate publication. The Data
+        User is urged to contact the authors of these data if any questions about methodology or
+        results occur. Where appropriate, the Data User is encouraged to consider collaboration or
+        co-authorship with the authors. The Data User should realize that misinterpretation of data
+        may occur if used out of context of the original study. While substantial efforts are made
+        to ensure the accuracy of data and associated documentation, complete accuracy of data sets
+        cannot be guaranteed. All data are made available "as is." The Data User should be aware,
+        however, that data are updated periodically and it is the responsibility of the Data User to
+        check for new versions of the data. The data authors and the repository where these data
+        were obtained shall not be liable for damages resulting from any use or misinterpretation of
+        the data. Thank you. 
+    
+    
+      
+        Midwest and Northeast USA
+        
+          -96.73
+          -68.19
+          49.42
+          36.56
+        
+      
+      
+        
+          
+            1990-01-01
+          
+          
+            2018-12-13
+          
+        
+      
+    
+    
+      completed
+    
+    
+      Hilary Dugan
+      University of Wisconsin-Madison
+      hdugan@wisc.edu
+      https://orcid.org/0000-0003-4674-1149
+    
+    
+      
+        
+           We leveraged publicly available land use, lake catchment and morphometry, and
+            climate data across a 17-state area of the Midwest and Northeast United States, to
+            predict chloride concentrations in 49,432 lakes. Our general methodology included: 1)
+            Acquiring and geoprocessing lake water quality data and site characteristics. 2)
+            Harmonizing training datasets. 3) Building a machine learning model for chloride
+            prediction. Calculating model fit. 4) Building a prediction dataset for 49,432 lakes. 
+           Training Dataset 
+           Observational chloride measurements from lakes, reservoirs, and impoundments were
+            downloaded from the US water quality portal (WQP). All results were converted to mg L-1,
+            and only data with ResultStatusIdentifier as Accepted or Final noted in the dataset were retained. The initial search of 115,389 observations was
+            then filtered to data collected after 1990, chloride concentrations &lt; 10,000 mg
+            L-1, and water samples less than 10 m deep or with depth not listed (where the
+            assumption was an epilimnion measurement). These quality control steps were taken to
+            limit inclusion of historical data that may not represent current conditions, remove
+            naturally saline waterbodies (n =5, adjacent/connected to the Atlantic Ocean), and
+            remove potentially meromictic lakes (n=0). Multiple observations collected on the same
+            day were averaged. Lakes with missing watershed information were removed, resulting in
+            29,675 unique daily observations from 2,773 lakes. Three states (Illinois, Iowa, and
+            Rhode Island) had no chloride data, and three states (Pennsylvania, Connecticut, and New
+            Hampshire) had chloride data from only one lake. 2,773 lakes represent 5% of the
+            region’s lakes. 
+           WQP site identification numbers (IDs) from the dataset were linked to the
+            high-resolution National Hydrography Dataset (NHD) that accessed bounding box
+            information of each NHD shapefile and ran a spatial join. The resulting relational table
+            linked each chloride observation to an individual lake through an NHD ID. For every NHD
+            lake ID, geospatial lake data were obtained from the LAGOS-NE database (Soranno et
+            al. 2017), which provides watershed ecological context for all lakes greater than 4 ha
+            in the 17-state area. Additional site characteristics were extracted from GIS line files
+            of US interstates, US primary roads, and gridded winter severity data. Across all
+            predictor variables in the training dataset, minimum values were &gt;= 0.01. After
+            converting zero values to 0.001, all data were log-transformed. 
+          
+             Machine Learning Model 
+             A quantile regression forest (QRF) was used to model the relationship between
+            observed chloride concentrations and lake and watershed characteristics. This model was
+            chosen to accommodate a large number of correlated predictor variables, the presence of
+            non-linear responses, and the potential importance of interactions among predictor
+            variables. The QRF was implemented with 1,000 trees using the ranger package in R, with
+            mtry set to 4 (Wright and Ziegler 2017). 
+             To avoid overfitting the QRF to lakes with a greater number of chloride
+            observations, we developed a customized sampling routine that constructed individual
+            trees using the observations from a random subset of the study lakes (95% subset: the in-bag samples). Each resulting tree was used to make out-of-bag predictions on the remaining
+            observations from the 5% of excluded lakes. All predictions are reported as the median
+            of the terminal node values from each tree, with the corresponding 90%-prediction
+            interval calculated from the .05 and 0.95 quantiles of the estimated conditional
+            distribution of the response variable (Meinshausen 2006). Median terminal node values
+            were chosen over mean values because they had superior predictive performance on
+            out-of-bag observations. 
+          
+          
+             Prediction Dataset 
+             A prediction dataset was constructed for the full LAGOS-NE dataset, which contained
+            51,102 lakes and reservoirs greater than 4 ha in the 17-state area. After removing lakes
+            with no available land-use data because the watersheds crossed the US/Canada border,
+            49,432 lakes remained, of which 2,773 were used for training the model. The prediction
+            dataset was identical in structure to the training dataset, but contained no
+            observational chloride data. 
+          
+          
+            Wisconsin Lake Chloride Observations
+            Independent measurements were taken from Wisconsin Lakes in the summer of 2018. Samples were taken from the surface of each lake, and analyzed for chloride (and sulfate) simultaneously by Ion Chromatography, using a hydroxide eluent. The detection limit for chloride is approximately 0.01 ppm. Chloride is determined by a Dionex model ICS 2100 using an electro-chemical suppressor.
+          
+          
+            References
+             Meinshausen, N. 2006. Quantile Regression Forests. Journal of Machine Learning
+            Research 7:983–999. 
+             Soranno, P. A., L. C. Bacon, M. Beauchene, K. E. Bednar, E. G. Bissell, C. K.
+            Boudreau, M. G. Boyer, M. T. Bremigan, S. R. Carpenter, J. W. Carr, K. S. Cheruvelil, S.
+            T. Christel, M. Claucherty, S. M. Collins, J. D. Conroy, J. A. Downing, J. Dukett, C. E.
+            Fergus, C. T. Filstrup, C. Funk, M. J. Gonzalez, L. T. Green, C. Gries, J. D. Halfman,
+            S. K. Hamilton, P. C. Hanson, E. N. Henry, E. M. Herron, C. Hockings, J. R. Jackson, K.
+            Jacobson-Hedin, L. L. Janus, W. W. Jones, J. R. Jones, C. M. Keson, K. B. S. King, S. A.
+            Kishbaugh, J.-F. Lapierre, B. Lathrop, J. A. Latimore, Y. Lee, N. R. Lottig, J. A.
+            Lynch, L. J. Matthews, W. H. McDowell, K. E. B. Moore, B. P. Neff, S. J. Nelson, S. K.
+            Oliver, M. L. Pace, D. C. Pierson, A. C. Poisson, A. I. Pollard, D. M. Post, P. O.
+            Reyes, D. O. Rosenberry, K. M. Roy, L. G. Rudstam, O. Sarnelle, N. J. Schuldt, C. E.
+            Scott, N. K. Skaff, N. J. Smith, N. R. Spinelli, J. J. Stachelek, E. H. Stanley, J. L.
+            Stoddard, S. B. Stopyak, C. A. Stow, J. M. Tallant, P.-N. Tan, A. P. Thorpe, M. J.
+            Vanni, T. Wagner, G. Watkins, K. C. Weathers, K. E. Webster, J. D. White, M. K. Wilmes,
+            and S. Yuan. 2017. LAGOS-NE: a multi-scaled geospatial and temporal database of lake
+            ecological context and water quality for thousands of US lakes. GigaScience 6:1–22. 
+             Wright, M. N., and A. Ziegler. 2017. ranger: A Fast Implementation of Random
+            Forests for High Dimensional Data in C++ and R. Journal of Statistical Software:1–17.
+          
+          
+        
+      
+      
+        
+          This method step describes provenance-based metadata as specified in the LTER EML Best Practices.
+          This provenance metadata does not contain entity specific information.
+        
+        
+          LAGOS-NE-GEO v1.05: A module for LAGOS-NE, a multi-scaled geospatial and temporal database of lake ecological context and water quality for thousands of U.S. Lakes: 1925-2013
+          
+            Patricia A Soranno
+            Michigan State University
+            soranno@msu.edu
+            0000-0003-1668-9271
+          
+          
+            Kendra S Cheruvelil
+            Michigan State University
+            ksc@msu.edu
+            0000-0003-1880-2880
+          
+          
+            
+              This online link references an EML document that describes data used in the creation of this derivative data package.
+              https://pasta.lternet.edu/package/metadata/eml/edi/99/5
+            
+          
+          
+            Patricia A Soranno
+            Michigan State University
+            soranno@msu.edu
+          
+          
+            Information Manager
+            LAGOS.lakes.contact@gmail.com
+          
+        
+      
+      
+        
+          
+            This method step describes provenance-based metadata
+          
+          
+            This provenance metadata does not contain entity specific information.
+          
+        
+        
+          
+            Water Quality Portal
+          
+          
+            USGS
+          
+          
+            Environmental Protection Agency
+          
+          
+            
+              
+                This online link references an EML document that describes data used in the creation of this derivative data package.
+              
+              
+                https://www.waterqualitydata.us/
+              
+            
+          
+          
+            USGS
+          
+        
+      
+    
+    
+      Collaborative Research: Building Analytical, Synthesis, and Human Network Skills Needed
+        for Macrosystem Science: a Next Generation Graduate Student Training Model Based on
+        GLEON
+      
+        Kathleen Weathers
+        https://orcid.org/0000-0002-3575-6508
+        Principal Investigator
+      
+      NSF EF-1137327 and EF-1702991
+    
+    
+      lakeCL_predictions.csv
+      chloride prediction model output
+      
+        lakeCL_predictions.csv
+        10153548
+        9b23d7e8d75efbdc4bd28007b06e445d
+        
+          
+            1
+            \n
+            column
+            
+              ,
+              "
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/452/2/282e3d41aef63c11c386cf65eed1b26d
+          
+        
+      
+      
+        
+          lagoslakeid
+          Unique lake identifier developed for LAGOS-NE
+          string
+          
+            
+              
+                
+                  Unique lake identifier developed for LAGOS-NE
+                
+              
+            
+          
+        
+        
+          nhdid
+          Unique lake identifier from National Hydrography
+            dataset
+          string
+          
+            
+              
+                
+                  Unique lake identifier from National Hydrography dataset
+                
+              
+            
+          
+        
+        
+          gnis_name
+          Lake Name
+          string
+          
+            
+              
+                
+                  Lake Name
+                
+              
+            
+          
+        
+        
+          nhd_lat
+          Latitude
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  35.998945
+                  48.98999
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          nhd_long
+          Longitude
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  -97.216823
+                  -67.091051
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          LakeArea
+          Surface area of the lake
+          float
+          
+            
+              
+                hectare
+              
+              
+                real
+                
+                  4
+                  66650.33
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Area
+          Surface area of the watershed
+          float
+          
+            
+              
+                hectare
+              
+              
+                real
+                
+                  0.1
+                  3204167.25
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          MaxDepth
+          Maximum depth of lake
+          float
+          
+            
+              
+                meter
+              
+              
+                real
+                
+                  0.1
+                  198.4
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          lakeconnection
+          Connectivity of focal lake to upstream features (DR_LakeStream =
+            drainage lake with an upstream lake, DR_Stream = drainage lake with upstream stream,
+            Headwater = lake with outlet but no inlet, Isolated = lake with no inlets or
+            outlets)
+          string
+          
+            
+              
+                
+                  
+                    DR_LakeStream
+                    drainage lake with an upstream lake
+                  
+                  
+                    Headwater
+                    lake with outlet but no inlet
+                  
+                  
+                    DR_Stream
+                    drainage lake with upstream stream
+                  
+                  
+                    Isolated
+                    lake with no inlets or outlets
+                  
+                
+              
+            
+          
+        
+        
+          WS_OpenWater
+          % landuse classified as open water in the watershed. Derived from the
+            National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  100
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Dev_Open
+          % landuse classified as open space, developed in the watershed.
+            Derived from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  100
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Dev_Low
+          % landuse classified as developed, low intensity in the watershed.
+            Derived from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  100
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Dev_Med
+          % landuse classified as developed, medium intensity in the watershed.
+            Derived from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  100
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Dev_High
+          % landuse classified as developed, high intensity in the watershed.
+            Derived from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  83.51
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Barren
+          % landuse classified as barren/transitional in the watershed. Derived
+            from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  100
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_DeciduousForest
+          % landuse classified as deciduous forest in the watershed. Derived
+            from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  100
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_EvergreenForest
+          % landuse classified as evergreen forest in the watershed. Derived
+            from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  98.84
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_MixedForest
+          % landuse classified as mixed forest in the watershed. Derived from
+            the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  86.15
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Schrub
+          % landuse classified as schrubland in the watershed. Derived from the
+            National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  97.63
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Grassland
+          % landuse classified as grassland in the watershed. Derived from the
+            National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  100
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_PastureHay
+          % landuse classified as pasture/hay in the watershed. Derived from
+            the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  100
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Crops
+          % landuse classified as row crops in the watershed. Derived from the
+            National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  100
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_WoodyWetlands
+          % landuse classified as woody wetlands in the watershed. Derived from
+            the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  100
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_EmergentWetlands
+          % landuse classified as herbaceous wetlands in the watershed. Derived
+            from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  100
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_RoadDensity
+          Road density in the watershed. Derived from the National Land Cover
+            Dataset (NLCD).
+          float
+          
+            
+              
+                metersPerHectare
+              
+              
+                real
+                
+                  0
+                  5631.9
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          InterstateDistance
+          Distance to the nearest interstate
+          float
+          
+            
+              
+                meter
+              
+              
+                real
+                
+                  0.01
+                  311.21
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          RoadDistance
+          Distance to the nearest road
+          float
+          
+            
+              
+                meter
+              
+              
+                real
+                
+                  0
+                  114.41
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WinterSeverity
+          Winter severity index obtained from ClearRoads (national research
+            consortium, clearroads.org). Calculated from 2000 to 2010 as 0.50 × (average annual
+            snowfall in inches) + 0.05 × (annual duration of snowfall in hours) + 0.05 × (annual
+            duration of blowing snow in hours) + 0.10 × (annual duration of freezing rain in
+            hours).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  4.97
+                  185.17
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          state_name
+          Name of US state that lake is located in (or partially
+            in)
+          string
+          
+            
+              
+                
+                  Name of US state that lake is located in (or partially
+                    in)
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          pred_05
+          Prediction interval: 0.05 quantile
+          float
+          
+            
+              
+                milligramsPerLiter
+              
+              
+                real
+                
+                  0.071
+                  955.001
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          pred_50
+          Median prediction
+          float
+          
+            
+              
+                milligramsPerLiter
+              
+              
+                real
+                
+                  0.081
+                  2778.001
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          pred_95
+          Prediction interval: 0.95 quantile
+          float
+          
+            
+              
+                milligramsPerLiter
+              
+              
+                real
+                
+                  0.262321230738575
+                  2979.001
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+      
+      49432
+    
+    
+      lakeCL_trainingData.csv
+      chloride prediction model training data
+      
+        lakeCL_trainingData.csv
+        6477664
+        d9bc49d4207530cfbbcbc26115e3b509
+        
+          
+            1
+            \n
+            column
+            
+              ,
+              "
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/452/2/c485df5d24d63fe422c2f1949872ff51
+          
+        
+      
+      
+        
+          lagoslakeid
+          Unique lake identifier developed for LAGOS-NE
+          string
+          
+            
+              
+                
+                  Unique lake identifier developed for LAGOS-NE
+                
+              
+            
+          
+        
+        
+          nhdid
+          Unique lake identifier from National Hydrography
+            dataset
+          string
+          
+            
+              
+                
+                  Unique lake identifier from National Hydrography dataset
+                
+              
+            
+          
+        
+        
+          gnis_name
+          Lake Name
+          string
+          
+            
+              
+                
+                  Lake Name
+                
+              
+            
+          
+        
+        
+          ActivityStartDate
+          Date of sampling
+          date
+          
+            
+              YYYY-MM-DD
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          Chloride
+          Chloride concentration
+          float
+          
+            
+              
+                milligramsPerLiter
+              
+              
+                real
+                
+                  0.05
+                  2979
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          nhd_lat
+          Latitude
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  36.56094
+                  48.720568
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          nhd_long
+          Longitude
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  -96.732596
+                  -68.193229
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          MaxDepth
+          Maximum depth of lake
+          float
+          
+            
+              
+                meter
+              
+              
+                real
+                
+                  0.9144
+                  198.4
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          state_name
+          Name of US state that lake is located in (or partially
+            in)
+          string
+          
+            
+              
+                
+                  Name of US state that lake is located in (or partially
+                    in)
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          Month
+          Month of sampling
+          float
+          
+            
+              
+                nominalMonth
+              
+              
+                natural
+                
+                  1
+                  12
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          LakeArea
+          Surface area of the lake
+          float
+          
+            
+              
+                hectare
+              
+              
+                real
+                
+                  4.01024496
+                  66650.33233
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Area
+          Surface area of the watershed
+          float
+          
+            
+              
+                hectare
+              
+              
+                real
+                
+                  0.538460682
+                  1482384.634
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WinterSeverity
+          Winter severity index obtained from ClearRoads (national research
+            consortium, clearroads.org). Calculated from 2000 to 2010 as 0.50 × (average annual
+            snowfall in inches) + 0.05 × (annual duration of snowfall in hours) + 0.05 × (annual
+            duration of blowing snow in hours) + 0.10 × (annual duration of freezing rain in
+            hours).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  7.6015625
+                  168.0865625
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_OpenWater
+          % landuse classified as open water in the watershed. Derived from the
+            National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  96.97
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Dev_Open
+          % landuse classified as open space, developed in the watershed.
+            Derived from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  87.53
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Dev_Low
+          % landuse classified as developed, low intensity in the watershed.
+            Derived from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  65.58
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Dev_Med
+          % landuse classified as developed, medium intensity in the watershed.
+            Derived from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  53.75
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Dev_High
+          % landuse classified as developed, high intensity in the watershed.
+            Derived from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  56.92
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Barren
+          % landuse classified as barren/transitional in the watershed. Derived
+            from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  29.76
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_DeciduousForest
+          % landuse classified as deciduous forest in the watershed. Derived
+            from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  97.79
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_EvergreenForest
+          % landuse classified as evergreen forest in the watershed. Derived
+            from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  80.6
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_MixedForest
+          % landuse classified as mixed forest in the watershed. Derived from
+            the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  73.55
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Schrub
+          % landuse classified as schrubland in the watershed. Derived from the
+            National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  54.62
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Grassland
+          % landuse classified as grassland in the watershed. Derived from the
+            National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  54.98
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_PastureHay
+          % landuse classified as pasture/hay in the watershed. Derived from
+            the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  68.65
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_Crops
+          % landuse classified as row crops in the watershed. Derived from the
+            National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  95.04
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_WoodyWetlands
+          % landuse classified as woody wetlands in the watershed. Derived from
+            the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  74.5
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_EmergentWetlands
+          % landuse classified as herbaceous wetlands in the watershed. Derived
+            from the National Land Cover Dataset (NLCD).
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  54.63
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          WS_RoadDensity
+          Road density in the watershed. Derived from the National Land Cover
+            Dataset (NLCD).
+          float
+          
+            
+              
+                metersPerHectare
+              
+              
+                real
+                
+                  0
+                  216.7235
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          InterstateDistance
+          Distance to the nearest interstate
+          float
+          
+            
+              
+                meter
+              
+              
+                real
+                
+                  0.0121248275743821
+                  307.264679466468
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          RoadDistance
+          Distance to the nearest road
+          float
+          
+            
+              
+                meter
+              
+              
+                real
+                
+                  0.0120108118367678
+                  41.7947589266611
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+      
+      29010
+    
+    
+      WisconsinLakes_Chloride.csv
+      Chloride concentrations from a suite of Wisconsin Lakes in summer
+        2018
+      
+        WisconsinLakes_Chloride.csv
+        1926
+        ad449414a633fcf133ab840f48952445
+        
+          
+            1
+            \n
+            column
+            
+              ,
+              "
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/452/2/1a2e9e51eb15d6ac0b5e5447e526739a
+          
+        
+      
+      
+        
+          lagoslakeid
+          Unique lake identifier developed for LAGOS-NE
+          string
+          
+            
+              
+                
+                  Unique lake identifier developed for LAGOS-NE
+                
+              
+            
+          
+        
+        
+          nhdid
+          Unique lake identifier from National Hydrography
+            dataset
+          string
+          
+            
+              
+                
+                  Unique lake identifier from National Hydrography dataset
+                
+              
+            
+          
+        
+        
+          GNIS_Name
+          Official NHD Lake Name
+          string
+          
+            
+              
+                
+                  Official NHD Lake Name
+                
+              
+            
+          
+        
+        
+          LakeName
+          Lake Name
+          string
+          
+            
+              
+                
+                  Lake Name
+                
+              
+            
+          
+        
+        
+          Date
+          Sampling date
+          date
+          
+            
+              YYYY-MM-DD
+              
+            
+          
+        
+        
+          Chloride_mgL
+          Chloride concentration
+          float
+          
+            
+              
+                milligramsPerLiter
+              
+              
+                real
+                
+                  3.29
+                  180.2
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          lon
+          Longitude
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  -90.0314
+                  -88.3568
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+        
+          lat
+          Latitude
+          float
+          
+            
+              
+                degree
+              
+              
+                real
+                
+                  42.5417
+                  46.0239
+                
+              
+            
+          
+          
+            NA
+            not available
+          
+        
+      
+      27
+    
+    
+      QRF_script.R
+      R code which builds a quantile regression forest model using observational
+        chloride data and predictor variables found in lakeCL_trainingData.csv
+      
+        QRF_script.R
+        4030
+        8db012a0c324c2973b746185320c06e6
+        
+          
+            unknown
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/452/2/2da0f3fc683707f99bda2fc5f642d75d
+          
+        
+      
+      unknown
+    
+  
+  
+    
+      
+        
+          
+        
+        
+          
+        
+      
+    
+  

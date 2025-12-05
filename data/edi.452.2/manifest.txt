@@ -1,0 +1,8 @@
+Manifest file for edi.452.2.zip created on Tue Dec 02 20:26:25 UTC 2025
+lakeCL_predictions.csv (10153548 bytes)
+lakeCL_trainingData.csv (6477664 bytes)
+WisconsinLakes_Chloride.csv (1926 bytes)
+QRF_script.R (4030 bytes)
+edi.452.2.xml (84991 bytes)
+edi.452.2.txt (46718 bytes)
+edi.452.2.report.xml (80258 bytes)
