@@ -19,6 +19,10 @@ execute:
 
 The purpose of this project is to identify different drivers of lake contamination by anthropogenic chloride in Midwest and Northeast United States. Its important to identify drivers of chloride contamination because of its negative effects on ecosystems and drinking water quality. By seeing what variables have a positive effect on chloride concentrations, we can better identify lakes at risk.
 
+Human activity has a big influence on chloride pollution in lakes. Chloride can be introduced into lakes via road salts, sewage leaks, industrial waste, and septic systems. The reason the Midwest and Northeast United States was chosen as the study area was due to its use of road salts. This region experiences lots of snow every year, so they utilize lots of road salts to keep ice off their roads. Unfortunately, this causes road salt run off to enter near by water bodies causing spikes in chloride concentration.
+
+When concentrations of chloride are high in freshwater ecosystems this causes physiological stress in many aquatic organisms such as fish, amphibians, and macroinvertebrates. Chloride disrupts their ability to regulate ions and maintain proper water balance. Chloride also increase water density, stratification, and reduces natural mixing causing lower oxygen levels in deeper waters. This can lead to reduced growth, reproduction problems, or death in sensitive species. The extent of chloride's effect doesn't stop their. Plants are also at risk because chloride causes leaf burn, which reduces photosynthesis. Reductions in photosynthesis will result in reduced plant growth, reduced oxygen in the water, and reduced food availability for fish and invertebrates.
+
 ## Data
 
 ```{r}
@@ -37,9 +41,10 @@ library(kableExtra)})
 df <- suppressMessages(read_csv(here('data', 'edi.452.2', "lakeCL_trainingData.csv")))
 ```
 
-The data I'm using has chloride concentrations for 2,773 lakes in the Midwest and Northeast United States. This data was collected from 1990-01-01 to 2018-12-13 and contains data about the lake's watershed characteristics, dimensions, and its proximity to roads. When the chloride concentrations are plotted on a histogram its clear the data is right skewed. Since this variable is continuous, strictly positive, and right-skewed I decided to model it with a GLM with Gamma family and log link.
+The data I'm using has chloride concentrations for 2,773 lakes in the Midwest and Northeast United States. This data was collected from 1990-01-01 to 2018-12-13 and contains data about the lake's watershed characteristics, dimensions, and its proximity to roads. When the chloride concentrations are plotted on a histogram its clear the data is positive. Since chloride is a continuous and strictly positive variable I decided to model it with a GLM with Gamma family and log link.
 
 ```{r}
+# Make a histogram showing the data distribution of Chloride
 df |>
   ggplot(aes(x = Chloride)) +
   geom_histogram(bins = 50, fill = "lightblue", color = "blue") +
@@ -49,19 +54,21 @@ df |>
   theme_minimal()
 ```
 
+For this analysis, I chose `WS_RoadDensity` as my main predictor variable of interest, and `WS_Dev_High`, `RoadDistance`, and `InterstateDistance` as confounding variables. I chose these 3 confounding variables because they show some correlation with chloride, as shows below in the correlation matrix.
+
+```{r}
+# Visualize how correlated Chloride is with WS_Dev_High, RoadDistance, and InterstateDistance
+cor(df[, c("Chloride", "WS_Dev_High", "RoadDistance", "InterstateDistance")], use = "complete.obs")
+```
+
 ### Study Question:
 
--   Does the road density in a watershed impact chloride concentrations in lakes? (I'm wondering if I should run this analysis on high-intensity developed land in a watershed too)
+-   Does the road density in a watershed impact chloride concentrations in lakes?
 
 | Column | Meaning |
 |------------------------------------|------------------------------------|
-| `LakeArea` | Surface area of the lake |
-| `MaxDepth` | Maximum depth of lake |
-| `WS_Area` | Surface area of the watershed |
-| `WS_OpenWater` | \% landuse classified as open water in the watershed |
 | `WS_Dev_High` | \% landuse classified as developed, high intensity in the watershed |
 | `WS_RoadDensity` | Road density in the watershed |
-| `WS_Crops` | \% landuse classified as row crops in the watershed |
 | `InterstateDistance` | Distance to the nearest interstate |
 | `RoadDistance` | Distance to the nearest road |
 | `Chloride` | Concentration of chloride in lake |
@@ -90,10 +97,7 @@ The model below is a GLM with Gamma family and log link. In this model Chloride 
 $$ 
 \begin{align}
 Chloride &\sim \text{Gamma}(\mu, \phi) \\
-\log(\mu) &= \beta_0 + \beta_1 \,\text{WSRoadDensity} + \beta_2 \,\text{WSCrops} + \beta_3 \,\text{WSDevHigh} \\
-&\quad + \beta_4 \,\text{LakeArea} + \beta_5 \,\text{WSArea} + \beta_6 \,\text{MaxDepth} \\
-&\quad + \beta_7 \,\text{WSOpenWater} + \beta_8 \,\text{RoadDistance} + \beta_9 \,\text{InterstateDistance}
-\end{align} 
+\log(\mu) &= \beta_0 + \beta_1 \,\text{WSRoadDensity} + \beta_2 \,\text{WSDevHigh} + \beta_3 \,\text{RoadDistance} \\&\quad + \beta_4 \,\text{InterstateDistance} \end{align} 
 $$
 
 ### Hypothesis
@@ -109,10 +113,8 @@ $$
 # Make a Gamma model with Chloride as response and WS_RoadDensity as the predictor
 model_cl <- glm( Chloride ~ WS_RoadDensity 
     # Confounding variables
-    + WS_Crops + WS_Dev_High + LakeArea 
-    + WS_Area + MaxDepth + WS_OpenWater +
-    RoadDistance + InterstateDistance,
- 
+    + WS_Dev_High + RoadDistance + InterstateDistance,
+    
   family = Gamma(link = "log"),
   data = df
 )
@@ -131,70 +133,27 @@ model_table <- tidy(model_cl) |> # Turn model_cl into a tidy tibble
   )
 
 # Create kable with model_cl outputs
-kable(model_table, format = "html", caption = "Gamma GLM Results") |>
+k1 <- kable(model_table, format = "html", caption = "Gamma GLM Results") |>
   kable_styling(full_width = TRUE, bootstrap_options = c("striped")) 
 
+# Print the kable
+k1
 
 ```
 
-## Simulate Data
-
-The code chunk below uses the model_cl model to simulate data to be used in our model predictions. This data is simulated with new chloride concentration values by using fitted Gamma GLM. This is done to see if the model has reasonable assumptions. New values are simulated using the model’s estimated mean and dispersion.
-
-The Gamma GLM assumes that:
-
--   chloride is continuous and positive
-
--   variance increases as the mean increases
-
--   effects of predictor variables are multiplicative
-
 ```{r}
-# Set seed
-set.seed(67)
-
-# Extract coefficients from fitted model
-coefficients <- coef(model_cl)
-# Extract the model matrix
-matrix <- model.matrix(model_cl)
-# Perform matrix multiplication to find linear predictor
-linear_predictor <- matrix %*% coefficients 
-# exp() to get expected mean chloride concentration
-expected_mean_cl <- exp(linear_predictor)
-# Convert model dispersion estimate to a shape parameter
-disp <- summary(model_cl)$dispersion
-shape <- 1 / disp
-
-# Simulate new Chloride data
-Chloride_sim <- rgamma(
-  n = length(expected_mean_cl),
-  shape = shape,
-  scale = expected_mean_cl / shape
-)
-
 # Assign rows used in the  model_cl model to df_model
 df_model <- model_cl$model
 
-# Create a Chloride_sim column and insert the Chloride_sim data into it 
-df_simulated <- df_model |>
-  mutate(Chloride_sim = Chloride_sim)
-```
-
-```{r}
 # Create a grid for plotting WS_RoadDensity and Chloride
 pred_line <- tibble(
-  WS_RoadDensity = seq(min(df_simulated$WS_RoadDensity, na.rm = TRUE),
-                    max(df_simulated$WS_RoadDensity, na.rm = TRUE),
+  WS_RoadDensity = seq(min(df_model$WS_RoadDensity, na.rm = TRUE),
+                    max(df_model$WS_RoadDensity, na.rm = TRUE),
                     length.out = 1000),
   # Find the mean of all confounding variables to hold them constant
-  WS_Dev_High = mean(df_simulated$WS_Dev_High, na.rm = TRUE),
-  LakeArea = mean(df_simulated$LakeArea, na.rm = TRUE),
-  WS_Area = mean(df_simulated$WS_Area, na.rm = TRUE),
-  MaxDepth = mean(df_simulated$MaxDepth, na.rm = TRUE),
-  WS_OpenWater = mean(df_simulated$WS_OpenWater, na.rm = TRUE),
-  WS_Crops = mean(df_simulated$WS_Crops, na.rm = TRUE),
-  RoadDistance = mean(df_simulated$RoadDistance, na.rm = TRUE),
-  InterstateDistance = mean(df_simulated$InterstateDistance, na.rm = TRUE)
+  WS_Dev_High = mean(df_model$WS_Dev_High, na.rm = TRUE),
+  RoadDistance = mean(df_model$RoadDistance, na.rm = TRUE),
+  InterstateDistance = mean(df_model$InterstateDistance, na.rm = TRUE)
 )
 
 ```
@@ -225,7 +184,7 @@ pred_line <- pred_line |>
 ```{r}
 # Plot data points, predicted mean curve, and 95% confidence interval
 ggplot() +
-  geom_point(data = df_simulated, aes(x = WS_RoadDensity, y = Chloride),
+  geom_point(data = df_model, aes(x = WS_RoadDensity, y = Chloride),
              color = "dodgerblue", alpha = .67) + # Data points
   geom_ribbon(data = pred_line, aes(x = WS_RoadDensity, ymin = lower, ymax = upper),
               alpha = 0.25, fill = "lightblue") + # Confidence interval
@@ -246,4 +205,122 @@ ggplot() +
 
 -   Alternative hypothesis (Hₐ): Road density has an effect on chloride concentrations in lakes (β₁ ≠ 0).
 
-Due to the fact that the p-vlaue of of `WS_RoadDensity` is much smaller than 0.05, my data rejects the null hypothesis. This means that road density in a watershed is strongly associated with chloride concentrations in lakes. According to my model for each 1-unit increase in `WS_RoadDensity` the expected chloride concentration increases by exp(0.0198) or 1.019997. This is likely caused by the fact that road salts are used to defrost roads since this is a snowy region of America.
+Due to the fact that the p-vlaue of of `WS_RoadDensity` is much smaller than 0.05, my data rejects the null hypothesis. This means that road density in a watershed is strongly associated with chloride concentrations in lakes. According to my model for each 1-unit increase in `WS_RoadDensity` the expected chloride concentration increases by exp(0.0172). This is likely caused by the fact that road salts are used to defrost roads since this is a snowy region of America.
+
+## Simulate Data
+
+The code chunk below uses the model_cl model to simulate data to be used in our model predictions. This data is simulated with new chloride concentration values by using fitted Gamma GLM. This is done to see if the model has reasonable assumptions. New values are simulated using the model’s estimated mean and standard deviation.
+
+The Gamma GLM assumes that:
+
+-   chloride is continuous and positive
+
+-   variance increases as the mean increases
+
+-   effects of predictor variables are multiplicative
+
+```{r}
+# Calculate the means and SDs for each predictor
+mean_WS_RoadDensity <- mean(df_model$WS_RoadDensity, na.rm = TRUE)
+sd_WS_RoadDensity   <- sd(df_model$WS_RoadDensity, na.rm = TRUE)
+
+mean_WS_Dev_High <- mean(df_model$WS_Dev_High, na.rm = TRUE)
+sd_WS_Dev_High   <- sd(df_model$WS_Dev_High, na.rm = TRUE)
+
+mean_RoadDistance <- mean(df_model$RoadDistance, na.rm = TRUE)
+sd_RoadDistance   <- sd(df_model$RoadDistance, na.rm = TRUE)
+
+mean_InterstateDistance <- mean(df_model$InterstateDistance, na.rm = TRUE)
+sd_InterstateDistance   <- sd(df_model$InterstateDistance, na.rm = TRUE)
+```
+
+```{r}
+# Set seed
+set.seed(67)
+
+# Choose the sample size
+n <- 10000
+
+# Extract coefficients from model_cl
+betas <- coef(model_cl)
+
+# Assign coefficients for each variable
+beta0 <- betas["(Intercept)"]
+beta1 <- betas["WS_RoadDensity"]
+beta2 <- betas["WS_Dev_High"] 
+beta3 <- betas["RoadDistance"]
+beta4 <- betas["InterstateDistance"]
+
+# Set the Gamma shape parameter
+phi <- 3
+
+# Simulate each of the predictors
+WS_RoadDensity <- rnorm(n, mean = mean_WS_RoadDensity, sd = sd_WS_RoadDensity)
+WS_Dev_High <- rnorm(n, mean = mean_WS_Dev_High, sd = sd_WS_Dev_High)
+RoadDistance <- rnorm(n, mean = mean_RoadDistance, sd = sd_RoadDistance)
+InterstateDistance <- rnorm(n, mean = mean_InterstateDistance, sd = sd_InterstateDistance)
+
+# Replace simulated negative values with 0s, since the gamma doesn't accept them
+WS_RoadDensity[WS_RoadDensity < 0] <- 0
+WS_Dev_High[WS_Dev_High < 0] <- 0
+RoadDistance[RoadDistance < 0] <- 0
+InterstateDistance[InterstateDistance < 0] <- 0
+
+# Compute the linear predictor
+log_mu <- beta0 +
+  beta1 * WS_RoadDensity +
+  beta2 * WS_Dev_High +
+  beta3 * RoadDistance +
+  beta4 * InterstateDistance
+
+# Convert the linear predictor to mean
+mu <- exp(log_mu)
+
+# Simulate chloride values
+Chloride <- rgamma(n, shape = phi, scale = mu / phi)
+
+# Put predicted vairables into a dataframe
+sim_df <- data.frame(Chloride, WS_RoadDensity, WS_Dev_High, RoadDistance, InterstateDistance)
+
+# Fit your Gamma GLM
+sim_model <- glm(
+  Chloride ~ WS_RoadDensity
+    # Confounding variables
+    + WS_Dev_High + RoadDistance + InterstateDistance,
+  
+  family = Gamma(link = "log"),
+  data = sim_df
+)
+
+# Select and round model outputs to include in kable
+model_table <- tidy(sim_model) |> # Turn sim_model into a tidy tibble
+  mutate(
+    estimate = round(estimate, 4),
+    std.error = round(std.error, 4),
+    statistic = round(statistic, 2),
+    p.value = round(p.value, 8)
+  )
+
+# Create kable with sim_model outputs
+k2 <- kable(model_table, format = "html", caption = "Simulated Gamma GLM Results") |>
+  kable_styling(full_width = TRUE, bootstrap_options = c("striped")) 
+
+# Print the kable
+k2
+
+```
+
+## Check the real data model estimates against the simulation model estimates
+
+```{r}
+# Print real data model estimates
+k1
+```
+
+```{r}
+# Print simulated data model estimates
+k2
+```
+
+After applying the model to the simulated dataset, constructed based on the assumptions of model_cl, the estimated parameters closely matched the true values. This demonstrates that the simulated data recovered the original model parameters. Even with simulated data, the p-value for WS_RoadDensity is much smaller than 0.05, indicating that we can reject the null hypothesis.
+
